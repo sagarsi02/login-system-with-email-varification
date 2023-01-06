@@ -2,7 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User, auth
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+import uuid
 
 def signUp(request):
     if request.method == 'POST':
@@ -24,7 +27,26 @@ def signUp(request):
             else:
                 usr = User.objects.create_user(first_name=f_name, last_name=l_name, username=username, email=email, password=password, is_active=active)
                 usr.save();
-                messages.success(request, 'Successfully Account Created')
+                token = uuid.uuid4()
+                print(token)
+                context ={
+                    "title":"Technical First",
+                    "Subject": "Varify Your Email Address",
+                    "Desc": "Verify you Account by clicking on the button below Verify Button.",
+                    "link": "http://127.0.0.1:8000/varifying/?token={0}".format(token),
+                    "logo": "https://yt3.ggpht.com/ytc/AMLnZu-M5aWKmXmGhv23j3lKkB2YzjUspTKLGT4WXNFH=s900-c-k-c0x00ffffff-no-rj"
+                }
+                html_content = render_to_string("email.html", context)
+                text_content = strip_tags(html_content)
+                email = EmailMultiAlternatives(
+                    'Account Activation Link',
+                    text_content,
+                    'sagarsingh@grampower.com',
+                    [usr.email]
+                )
+                email.attach_alternative(html_content, 'text/html')
+                email.send()
+                messages.success(request, 'Successfully Account Created... \n Please check your mail for account varification')
                 return redirect('/login')
 
         else:
@@ -38,16 +60,20 @@ def login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        if User.objects.filter(username=username).exists():
-            log_user = auth.authenticate(username=username, password=password)
-            if log_user is not None:
-                auth.login(request, log_user)
-                return redirect('/home')
+        if User.objects.filter(is_active = 1):
+            if User.objects.filter(username=username).exists():
+                log_user = auth.authenticate(username=username, password=password)
+                if log_user is not None:
+                    auth.login(request, log_user)
+                    return redirect('/home')
+                else:
+                    messages.info(request, 'Password is Wrong')
+                    return render(request, 'login.html')
             else:
-                messages.info(request, 'Password is Wrong')
+                messages.info(request, 'Username is not Exist')
                 return render(request, 'login.html')
         else:
-            messages.info(request, 'Username is not Exist')
+            messages.info(request, 'Please Varify your email... Check Your Email')
             return render(request, 'login.html')
     else:        
         return render(request, 'login.html')

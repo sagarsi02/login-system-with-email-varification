@@ -131,3 +131,9 @@ STATIC_ROOT = BASE_DIR / 'assets'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'sagarsingh@grampower.com'
+EMAIL_HOST_PASSWORD = '*************'
+EMAIL_USE_TLS = True

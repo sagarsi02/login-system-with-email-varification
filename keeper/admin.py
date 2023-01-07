@@ -1,11 +1,10 @@
 from django.contrib import admin
-from .models import Profile
+from .models import usr_token
 
-@admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin):
+@admin.register(usr_token)
+class usr_tokenAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'token',
         'user',
-        'varify',
     ]

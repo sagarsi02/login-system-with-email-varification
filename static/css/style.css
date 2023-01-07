@@ -5,6 +5,14 @@
   height: 100vh;
 }
 
+#message_note{
+  width: 259px;
+  display: flex;
+  margin: auto;
+}
+
+
+/* Email Page */
 @media screen {
   @font-face {
       font-family: 'Source Sans Pro';
